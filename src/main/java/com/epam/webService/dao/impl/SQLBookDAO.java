@@ -85,7 +85,7 @@ public class SQLBookDAO implements BookDAO {
             preparedStatement = connection.prepareStatement(SQL_UPDATE_BOOK_QUERY);
             preparedStatement.setString(1, book.getTitle());
             preparedStatement.setString(2, book.getAuthor());
-            preparedStatement.setInt(2, book.getId());
+            preparedStatement.setInt(3, book.getId());
             preparedStatement.executeUpdate();
         } catch (ConnectionPoolException | SQLException e) {
             throw new DAOException(EXECUTION_ERROR, e);

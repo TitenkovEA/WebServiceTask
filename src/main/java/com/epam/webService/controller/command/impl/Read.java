@@ -25,13 +25,13 @@ public class Read implements Command {
         BookService bookService = ServiceFactory.getInstance().getBookService();
         StringBuilder responseBuilder = new StringBuilder();
 
-        String contentType = request.getHeaders().get(HTTP_CONTENT_TYPE);
+        String acceptHeaderName = request.getHeaders().get("Accept");
         List<Book> bookList = bookService.readAll();
-        if (contentType.equals(JSON_TYPE)) {
+        if (acceptHeaderName.equals(JSON_TYPE)) {
             responseBuilder.append(HTTP_HEADER_CONTENT_TYPE_APPLICATION_JSON);
             responseBuilder.append(EMPTY_LINE);
             responseBuilder.append(JsonConverter.toJson(bookList));
-        } else if (contentType.equals(XML_TYPE)) {
+        } else if (acceptHeaderName.equals(XML_TYPE)) {
             responseBuilder.append(HTTP_HEADER_CONTENT_TYPE_APPLICATION_XML);
             responseBuilder.append(EMPTY_LINE);
             responseBuilder.append(XmlConverter.toXml(bookList));

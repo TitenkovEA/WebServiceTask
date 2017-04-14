@@ -1,6 +1,7 @@
 package com.epam.webService.util.converter;
 
 import com.epam.webService.bean.Book;
+import com.epam.webService.bean.BookList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,10 +32,13 @@ public class XmlConverter {
     }
 
     public static String toXml(List<Book> books) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Book.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(BookList.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
+
         StringWriter writer = new StringWriter();
-        marshaller.marshal(books, writer);
+        BookList bookList = new BookList();
+        bookList.setBookList(books);
+        marshaller.marshal(bookList, writer);
 
         return writer.toString();
     }

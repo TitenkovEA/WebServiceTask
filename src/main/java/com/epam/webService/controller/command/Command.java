@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface Command {
 
-    String HTTP_CONTENT_TYPE = "Content-Type";
+    String HTTP_CONTENT_TYPE = "Content-type";
 
     String JSON_TYPE = "application/json";
     String XML_TYPE = "application/xml";

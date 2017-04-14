@@ -31,7 +31,7 @@ public class HttpRequestParser {
         String[] headerParams = null;
         String headerName = null;
         String headerValue = null;
-        while (header.length() > 0) {
+        while (header != null && header.length() > 0) {
             headerParams = header.split(HEADER_DELIMITER);
             headerName = headerParams[0];
             headerValue = headerParams[1].substring(1);

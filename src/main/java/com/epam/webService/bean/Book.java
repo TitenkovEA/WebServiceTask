@@ -1,16 +1,18 @@
 package com.epam.webService.bean;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 /**
  * Created by Evgeny on 13.04.2017.
  */
 @XmlRootElement(name = "book")
 @XmlType(propOrder = {"title", "author"})
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Book {
+
+    @XmlAttribute
     private Integer id;
+
     private String title;
     private String author;
 
@@ -61,7 +63,6 @@ public class Book {
                 '}';
     }
 
-    @XmlAttribute
     public Integer getId() {
         return id;
     }
