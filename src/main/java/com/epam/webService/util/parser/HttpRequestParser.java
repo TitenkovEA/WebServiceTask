@@ -1,4 +1,6 @@
-package com.epam.webService.util.httpParser;
+package com.epam.webService.util.parser;
+
+import com.epam.webService.server.message.HttpRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,12 @@ public class HttpRequestParser {
     private static final String REQUEST_LINE_DELIMITER = "\\s";
     private static final String HEADER_DELIMITER = ":";
     private static final String NEW_LINE = "\n";
+    private static final int METHOD_INDEX = 0;
+    private static final int URI_INDEX = 1;
+    private static final int HTTP_VERSION_INDEX = 2;
+    private static final int HEADER_NAME_INDEX = 0;
+    private static final int HEADER_VALUE_INDEX = 1;
+    private static final int BEGIN_INDEX = 1;
 
     public static HttpRequest parse(String httpRequest) throws IOException { //TODO
         BufferedReader reader = new BufferedReader(new StringReader(httpRequest));
@@ -21,9 +29,9 @@ public class HttpRequestParser {
         /* Parse first http request line */
         String requestLine = reader.readLine();
         String[] requestLineParams = requestLine.split(REQUEST_LINE_DELIMITER);
-        request.setMethod(requestLineParams[0]);
-        request.setUri(requestLineParams[1]);
-        request.setVersion(requestLineParams[2]);
+        request.setMethod(requestLineParams[METHOD_INDEX]);
+        request.setUri(requestLineParams[URI_INDEX]);
+        request.setVersion(requestLineParams[HTTP_VERSION_INDEX]);
 
         /* Parse http request headers */
         Map<String, String> headers = new HashMap<>();
@@ -33,8 +41,8 @@ public class HttpRequestParser {
         String headerValue = null;
         while (header != null && header.length() > 0) {
             headerParams = header.split(HEADER_DELIMITER);
-            headerName = headerParams[0];
-            headerValue = headerParams[1].substring(1);
+            headerName = headerParams[HEADER_NAME_INDEX];
+            headerValue = headerParams[HEADER_VALUE_INDEX].substring(BEGIN_INDEX);
             headers.put(headerName, headerValue);
             header = reader.readLine();
         }

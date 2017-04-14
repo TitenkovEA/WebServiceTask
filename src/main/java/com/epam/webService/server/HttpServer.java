@@ -2,6 +2,7 @@ package com.epam.webService.server;
 
 import com.epam.webService.controller.Controller;
 import com.epam.webService.controller.exception.ControllerException;
+import com.epam.webService.server.message.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,7 +10,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -23,16 +23,12 @@ public class HttpServer {
 
     private static final String HTTP_VERSION = "HTTP/1.1";
 
-    private static final String CODE_SUCCESS = "200 OK";
-    private static final String CODE_SERVER_ERROR = "500 SERVER ERROR";
-
-    private static final String NEXT_LINE = "\n";
-
     private static final String HEADER_DATE = "Date: ";
-    private static final String HEADER_SERVER = "Server: MySocketServer\n";
+    private static final String HEADER_SERVER = "Server";
     private static final String HEADER_CONTENT_LENGTH = "Content-Length: ";
 
     private static final Controller controller = new Controller();
+    public static final String SERVER_NAME = "mySocketServer";
 
     private HttpServer() {
 
@@ -53,15 +49,15 @@ public class HttpServer {
     }
 
     private static class SocketHandler implements Runnable {
-        private Socket clientSocket;
+        private Socket socket;
         private InputStream inputStream;
         private OutputStream outputStream;
 
-        private SocketHandler(Socket clientSocket) {
-            this.clientSocket = clientSocket;
+        private SocketHandler(Socket socket) {
+            this.socket = socket;
             try {
-                inputStream = clientSocket.getInputStream();
-                outputStream = clientSocket.getOutputStream();
+                inputStream = socket.getInputStream();
+                outputStream = socket.getOutputStream();
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -71,18 +67,13 @@ public class HttpServer {
         public void run() {
             try {
                 String request = readInputRequest();
-                String response = controller.executeCommand(request);
-                writeResponse(CODE_SUCCESS, response);
+                HttpResponse response = controller.executeCommand(request);
+                writeResponse(response);
             } catch (IOException | ControllerException e) {
                 logger.error(e);
-                try {
-                    writeResponse(CODE_SERVER_ERROR, Arrays.toString(e.getStackTrace()));
-                } catch (IOException e1) {
-                    logger.error(e);
-                }
             } finally {
                 try {
-                    clientSocket.close();
+                    socket.close();
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -102,15 +93,13 @@ public class HttpServer {
             return request.toString();
         }
 
-        private void writeResponse(String code, String response) throws IOException {
-            String httpResponse =
-                    HTTP_VERSION + code + NEXT_LINE +
-                    HEADER_DATE + new Date().toString() + NEXT_LINE +
-                    HEADER_SERVER +
-                    HEADER_CONTENT_LENGTH + response.length() + NEXT_LINE +
-                    response;
+        private void writeResponse(HttpResponse response) throws IOException {
+            response.setVersion(HTTP_VERSION);
+            response.addHeader(HEADER_SERVER, SERVER_NAME)
+                    .addHeader(HEADER_CONTENT_LENGTH, String.valueOf(response.getBody().length()))
+                    .addHeader(HEADER_DATE, new Date().toString());
 
-            outputStream.write(httpResponse.getBytes());
+            outputStream.write(response.toString().getBytes());
             outputStream.flush();
         }
     }

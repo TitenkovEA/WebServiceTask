@@ -1,4 +1,4 @@
-package com.epam.webService.util.httpParser;
+package com.epam.webService.server.message;
 
 import java.util.Map;
 
