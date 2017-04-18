@@ -18,17 +18,20 @@ import java.util.Date;
 public class HttpServer {
     private static final Logger logger = LogManager.getLogger(HttpServer.class);
 
-    private static final int PORT = 8080;
+    private static final int PORT = 8888;
     private static final int BACKLOG = 10;
+    private static final String LOCAL_HOST = "127.0.0.1";
 
     private static final String HTTP_VERSION = "HTTP/1.1";
 
-    private static final String HEADER_DATE = "Date: ";
+    private static final String HEADER_DATE = "Date";
     private static final String HEADER_SERVER = "Server";
-    private static final String HEADER_CONTENT_LENGTH = "Content-Length: ";
+    private static final String SERVER_NAME = "mySocketServer";
+
+    private static final String HEADER_CONTENT_LENGTH = "Content-Length";
 
     private static final Controller controller = new Controller();
-    public static final String SERVER_NAME = "mySocketServer";
+    public static final String NEXT_LINE = "\n";
 
     private HttpServer() {
 
@@ -36,12 +39,12 @@ public class HttpServer {
 
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG, InetAddress.getLocalHost());
+            ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG, InetAddress.getByName(LOCAL_HOST));
             controller.initResource();
 
             while (true) {
                 Socket connection = serverSocket.accept();
-                new Thread(new SocketHandler(connection));
+                new Thread(new SocketHandler(connection)).start();
             }
         } catch (ControllerException | IOException e) {
             logger.error(e);
@@ -85,11 +88,10 @@ public class HttpServer {
             StringBuilder request = new StringBuilder();
 
             String line = reader.readLine();
-            while (line != null) {
-                request.append(line);
+            while (reader.ready()) {
+                request.append(line).append(NEXT_LINE);
                 line = reader.readLine();
             }
-
             return request.toString();
         }
 
